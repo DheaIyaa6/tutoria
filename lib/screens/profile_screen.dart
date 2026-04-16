@@ -13,7 +13,7 @@ class ProfileScreen extends StatelessWidget {
         child: Column(
           children: [
             // --- HEADER SECTION ---
-            Container(
+            SizedBox(
               height: 220,
               child: Stack(
                 children: [
@@ -43,7 +43,8 @@ class ProfileScreen extends StatelessWidget {
                       child: const CircleAvatar(
                         radius: 60,
                         backgroundColor: Colors.white,
-                        backgroundImage: NetworkImage('https://randomuser.me/api/portraits/men/32.jpg'),
+                        backgroundImage: NetworkImage(
+                            'https://randomuser.me/api/portraits/men/32.jpg'),
                       ),
                     ),
                   ),
@@ -54,7 +55,10 @@ class ProfileScreen extends StatelessWidget {
             const SizedBox(height: 15),
             const Text(
               "Dimas Anggara",
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: primaryColor),
+              style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: primaryColor),
             ),
             const Text(
               "Mahasiswa Sistem Informasi • UI",
@@ -68,13 +72,15 @@ class ProfileScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 children: [
-                  _buildProfileMenu(Icons.person_outline_rounded, "Personal Information"),
+                  _buildProfileMenu(
+                      Icons.person_outline_rounded, "Personal Information"),
                   _buildProfileMenu(Icons.history_rounded, "Learning History"),
                   _buildProfileMenu(Icons.payment_rounded, "Payment Methods"),
                   _buildProfileMenu(Icons.settings_outlined, "Settings"),
                   const Divider(height: 40, thickness: 1),
                   _buildProfileMenu(Icons.help_outline_rounded, "Help Center"),
-                  _buildProfileMenu(Icons.logout_rounded, "Sign Out", isLogout: true),
+                  _buildProfileMenu(Icons.logout_rounded, "Sign Out",
+                      isLogout: true),
                 ],
               ),
             ),
@@ -85,7 +91,8 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildProfileMenu(IconData icon, String title, {bool isLogout = false}) {
+  Widget _buildProfileMenu(IconData icon, String title,
+      {bool isLogout = false}) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -100,7 +107,8 @@ class ProfileScreen extends StatelessWidget {
         ],
       ),
       child: ListTile(
-        leading: Icon(icon, color: isLogout ? Colors.red : const Color(0xFF1A237E)),
+        leading:
+            Icon(icon, color: isLogout ? Colors.red : const Color(0xFF1A237E)),
         title: Text(
           title,
           style: TextStyle(
