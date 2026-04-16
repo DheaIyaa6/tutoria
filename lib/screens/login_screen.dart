@@ -50,7 +50,6 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-
                   const SizedBox(height: 10),
 
                   /// BACK BUTTON (FIX BERFUNGSI)
