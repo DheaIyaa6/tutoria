@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 
 class BookingScreen extends StatelessWidget {
   final List<Map<String, dynamic>> bookedData;
-  const BookingScreen({super.key, required this.bookedData});
-
+  final VoidCallback onBack;
+  const BookingScreen({
+    super.key,
+    required this.bookedData,
+    required this.onBack,
+  });
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -13,16 +17,27 @@ class BookingScreen extends StatelessWidget {
         appBar: AppBar(
           backgroundColor: Colors.white,
           elevation: 0,
-          title: const Text("My Bookings", style: TextStyle(color: Color(0xFF1A237E), fontWeight: FontWeight.bold)),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Color(0xFF1A237E)),
+            onPressed: onBack,
+          ),
+          title: const Text("My Bookings",
+              style: TextStyle(
+                  color: Color(0xFF1A237E), fontWeight: FontWeight.bold)),
           bottom: const TabBar(
             labelColor: Color(0xFF1A237E),
             indicatorColor: Color(0xFF1A237E),
-            tabs: [Tab(text: "Ongoing"), Tab(text: "Complete"), Tab(text: "Cancelled")],
+            tabs: [
+              Tab(text: "Ongoing"),
+              Tab(text: "Complete"),
+              Tab(text: "Cancelled")
+            ],
           ),
         ),
         body: TabBarView(
           children: [
-            _buildList(bookedData.where((m) => m["status"] == "Ongoing").toList()),
+            _buildList(
+                bookedData.where((m) => m["status"] == "Ongoing").toList()),
             const Center(child: Text("No completed bookings yet")),
             const Center(child: Text("No cancelled bookings yet")),
           ],
@@ -42,9 +57,12 @@ class BookingScreen extends StatelessWidget {
           margin: const EdgeInsets.only(bottom: 12),
           child: ListTile(
             leading: CircleAvatar(backgroundImage: NetworkImage(item["image"])),
-            title: Text(item["name"], style: const TextStyle(fontWeight: FontWeight.bold)),
+            title: Text(item["name"],
+                style: const TextStyle(fontWeight: FontWeight.bold)),
             subtitle: Text(item["campus"]),
-            trailing: const Text("Ongoing", style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold)),
+            trailing: const Text("Ongoing",
+                style: TextStyle(
+                    color: Colors.orange, fontWeight: FontWeight.bold)),
           ),
         );
       },

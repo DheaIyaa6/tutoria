@@ -9,28 +9,124 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // DATA MENTOR LENGKAP - 12 Mentor (Format Flat/Horizontal per baris)
     final List<Map<String, dynamic>> mentors = [
-      {"name": "Alya Putri", "campus": "UI", "major": "Informatika", "price": 50000, "image": "https://randomuser.me/api/portraits/women/1.jpg", "subjects": ["Flutter", "Dart", "UI/UX"], "experience": "3 Tahun Mobile Developer"},
-      {"name": "Rizky Pratama", "campus": "ITS", "major": "Teknik Informatika", "price": 60000, "image": "https://randomuser.me/api/portraits/men/2.jpg", "subjects": ["Java", "Spring Boot", "SQL"], "experience": "2 Tahun Backend Engineer"},
-      {"name": "Nadia Safira", "campus": "UGM", "major": "Manajemen", "price": 45000, "image": "https://randomuser.me/api/portraits/women/3.jpg", "subjects": ["Marketing", "Business Plan"], "experience": "4 Tahun Business Consultant"},
-      {"name": "Fajar Hidayat", "campus": "UNAIR", "major": "Kedokteran", "price": 70000, "image": "https://randomuser.me/api/portraits/men/4.jpg", "subjects": ["Anatomi", "Biologi"], "experience": "1 Tahun Dokter Muda"},
-      {"name": "Dinda Laras", "campus": "UNESA", "major": "Pendidikan Matematika", "price": 40000, "image": "https://randomuser.me/api/portraits/women/5.jpg", "subjects": ["Aljabar", "Kalkulus"], "experience": "2 Tahun Pengajar Olimpiade"},
-      {"name": "Bima Shakti", "campus": "ITB", "major": "Teknik Elektro", "price": 65000, "image": "https://randomuser.me/api/portraits/men/6.jpg", "subjects": ["Robotika", "IoT"], "experience": "3 Tahun Embedded Engineer"},
-      {"name": "Siti Aminah", "campus": "UPI", "major": "Pendidikan B. Inggris", "price": 35000, "image": "https://randomuser.me/api/portraits/women/7.jpg", "subjects": ["TOEFL", "IELTS"], "experience": "2 Tahun English Tutor"},
-      {"name": "Andi Wijaya", "campus": "UB", "major": "Ilmu Hukum", "price": 55000, "image": "https://randomuser.me/api/portraits/men/8.jpg", "subjects": ["Hukum Pidana", "Perdata"], "experience": "2 Tahun Junior Lawyer"},
-      {"name": "Maya Indah", "campus": "UNDIP", "major": "Psikologi", "price": 48000, "image": "https://randomuser.me/api/portraits/women/9.jpg", "subjects": ["Konseling", "Psikologi Anak"], "experience": "3 Tahun Konselor Sekolah"},
-      {"name": "Kevin Sanjaya", "campus": "BINUS", "major": "Game Development", "price": 75000, "image": "https://randomuser.me/api/portraits/men/10.jpg", "subjects": ["Unity", "C#"], "experience": "2 Tahun Game Designer"},
-      {"name": "Lusi Natalia", "campus": "UNPAD", "major": "Ilmu Komunikasi", "price": 42000, "image": "https://randomuser.me/api/portraits/women/11.jpg", "subjects": ["Public Speaking", "PR"], "experience": "4 Tahun PR Specialist"},
-      {"name": "Reza Rahadian", "campus": "IKJ", "major": "Seni Peran", "price": 90000, "image": "https://randomuser.me/api/portraits/men/12.jpg", "subjects": ["Akting", "Teater"], "experience": "10 Tahun Profesional Aktor"},
+      {
+        "name": "Alya Putri",
+        "campus": "UI",
+        "major": "Informatika",
+        "price": 50000,
+        "image": "https://randomuser.me/api/portraits/women/1.jpg",
+        "subjects": ["Flutter", "Dart", "UI/UX"],
+        "experience": "3 Tahun Mobile Developer"
+      },
+      {
+        "name": "Rizky Pratama",
+        "campus": "ITS",
+        "major": "Teknik Informatika",
+        "price": 60000,
+        "image": "https://randomuser.me/api/portraits/men/2.jpg",
+        "subjects": ["Java", "Spring Boot", "SQL"],
+        "experience": "2 Tahun Backend Engineer"
+      },
+      {
+        "name": "Nadia Safira",
+        "campus": "UGM",
+        "major": "Manajemen",
+        "price": 45000,
+        "image": "https://randomuser.me/api/portraits/women/3.jpg",
+        "subjects": ["Marketing", "Business Plan"],
+        "experience": "4 Tahun Business Consultant"
+      },
+      {
+        "name": "Fajar Hidayat",
+        "campus": "UNAIR",
+        "major": "Kedokteran",
+        "price": 70000,
+        "image": "https://randomuser.me/api/portraits/men/4.jpg",
+        "subjects": ["Anatomi", "Biologi"],
+        "experience": "1 Tahun Dokter Muda"
+      },
+      {
+        "name": "Dinda Laras",
+        "campus": "UNESA",
+        "major": "Pendidikan Matematika",
+        "price": 40000,
+        "image": "https://randomuser.me/api/portraits/women/5.jpg",
+        "subjects": ["Aljabar", "Kalkulus"],
+        "experience": "2 Tahun Pengajar Olimpiade"
+      },
+      {
+        "name": "Bima Shakti",
+        "campus": "ITB",
+        "major": "Teknik Elektro",
+        "price": 65000,
+        "image": "https://randomuser.me/api/portraits/men/6.jpg",
+        "subjects": ["Robotika", "IoT"],
+        "experience": "3 Tahun Embedded Engineer"
+      },
+      {
+        "name": "Siti Aminah",
+        "campus": "UPI",
+        "major": "Pendidikan B. Inggris",
+        "price": 35000,
+        "image": "https://randomuser.me/api/portraits/women/7.jpg",
+        "subjects": ["TOEFL", "IELTS"],
+        "experience": "2 Tahun English Tutor"
+      },
+      {
+        "name": "Andi Wijaya",
+        "campus": "UB",
+        "major": "Ilmu Hukum",
+        "price": 55000,
+        "image": "https://randomuser.me/api/portraits/men/8.jpg",
+        "subjects": ["Hukum Pidana", "Perdata"],
+        "experience": "2 Tahun Junior Lawyer"
+      },
+      {
+        "name": "Maya Indah",
+        "campus": "UNDIP",
+        "major": "Psikologi",
+        "price": 48000,
+        "image": "https://randomuser.me/api/portraits/women/9.jpg",
+        "subjects": ["Konseling", "Psikologi Anak"],
+        "experience": "3 Tahun Konselor Sekolah"
+      },
+      {
+        "name": "Kevin Sanjaya",
+        "campus": "BINUS",
+        "major": "Game Development",
+        "price": 75000,
+        "image": "https://randomuser.me/api/portraits/men/10.jpg",
+        "subjects": ["Unity", "C#"],
+        "experience": "2 Tahun Game Designer"
+      },
+      {
+        "name": "Lusi Natalia",
+        "campus": "UNPAD",
+        "major": "Ilmu Komunikasi",
+        "price": 42000,
+        "image": "https://randomuser.me/api/portraits/women/11.jpg",
+        "subjects": ["Public Speaking", "PR"],
+        "experience": "4 Tahun PR Specialist"
+      },
+      {
+        "name": "Reza Rahadian",
+        "campus": "IKJ",
+        "major": "Seni Peran",
+        "price": 90000,
+        "image": "https://randomuser.me/api/portraits/men/12.jpg",
+        "subjects": ["Akting", "Teater"],
+        "experience": "10 Tahun Profesional Aktor"
+      },
     ];
 
     return Scaffold(
       backgroundColor: const Color(0xFFF7F8FC),
       body: SafeArea(
         child: SingleChildScrollView(
-  physics: const AlwaysScrollableScrollPhysics(),
-  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-  child: Column(
-    // ... sisa kode desain kamu jangan disentuh ...
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+          child: Column(
+            // ... sisa kode desain kamu jangan disentuh ...
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // --- SECTION 1: HEADER ---
@@ -38,17 +134,22 @@ class HomeScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Image.asset(
-                    'assets/images/Tutoria.png', 
-                    height: 45, 
+                    'assets/images/Tutoria.png',
+                    height: 45,
                     errorBuilder: (context, error, stackTrace) => const Text(
-                      "TUTORIA", 
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 26, color: Color(0xFF1A237E))
-                    ),
+                        "TUTORIA",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 26,
+                            color: Color(0xFF1A237E))),
                   ),
                   Container(
                     padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
-                    child: const Icon(Icons.notifications_none_rounded, size: 28, color: Color(0xFF1A237E)),
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10)),
+                    child: const Icon(Icons.notifications_none_rounded,
+                        size: 28, color: Color(0xFF1A237E)),
                   ),
                 ],
               ),
@@ -57,11 +158,17 @@ class HomeScreen extends StatelessWidget {
               // --- SECTION 2: GREETING ---
               const Text(
                 "Halo, Mau Belajar Apa?",
-                style: TextStyle(fontSize: 16, color: Colors.grey, fontWeight: FontWeight.w500),
+                style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey,
+                    fontWeight: FontWeight.w500),
               ),
               const Text(
                 "Temukan Mentormu",
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF1A237E)),
+                style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF1A237E)),
               ),
               const SizedBox(height: 20),
 
@@ -70,7 +177,12 @@ class HomeScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(15),
-                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 5))],
+                  boxShadow: [
+                    BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 5))
+                  ],
                 ),
                 child: const TextField(
                   decoration: InputDecoration(
@@ -91,7 +203,7 @@ class HomeScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
                   image: const DecorationImage(
-                    image: AssetImage('assets/images/laptop.jpg'), 
+                    image: AssetImage('assets/images/laptop.jpg'),
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -101,7 +213,10 @@ class HomeScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                     gradient: LinearGradient(
                       begin: Alignment.bottomRight,
-                      colors: [Colors.black.withOpacity(0.8), Colors.transparent],
+                      colors: [
+                        Colors.black.withOpacity(0.8),
+                        Colors.transparent
+                      ],
                     ),
                   ),
                   child: Column(
@@ -109,14 +224,25 @@ class HomeScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                        decoration: BoxDecoration(color: Colors.orange, borderRadius: BorderRadius.circular(8)),
-                        child: const Text("PROMO KHUSUS", style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                            color: Colors.orange,
+                            borderRadius: BorderRadius.circular(8)),
+                        child: const Text("PROMO KHUSUS",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold)),
                       ),
                       const SizedBox(height: 8),
                       const Text(
                         "Dapatkan Diskon 50%\nUntuk Booking Pertama!",
-                        style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold, height: 1.2),
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            height: 1.2),
                       ),
                     ],
                   ),
@@ -128,15 +254,28 @@ class HomeScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text("Recommended Mentor", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1A237E))),
-                  TextButton(onPressed: () {}, child: const Text("Lihat Semua", style: TextStyle(color: Colors.blue))),
+                  const Text("Recommended Mentor",
+                      style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF1A237E))),
+                  TextButton(
+                      onPressed: () {},
+                      child: const Text("Lihat Semua",
+                          style: TextStyle(color: Colors.blue))),
                 ],
               ),
               const SizedBox(height: 10),
 
               // --- SECTION 6: MENTOR LIST ---
-              Column(
-                children: mentors.map((m) => _buildMentorCard(context, m)).toList(),
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: mentors.length,
+                itemBuilder: (context, index) {
+                  final mentor = mentors[index];
+                  return _buildMentorCard(context, mentor);
+                },
               ),
 
               // --- BOTTOM SPACING ---
@@ -156,7 +295,12 @@ class HomeScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 15, offset: const Offset(0, 8))],
+        boxShadow: [
+          BoxShadow(
+              color: Colors.black.withOpacity(0.02),
+              blurRadius: 15,
+              offset: const Offset(0, 8))
+        ],
       ),
       child: Column(
         children: [
@@ -165,7 +309,9 @@ class HomeScreen extends StatelessWidget {
               Container(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(color: const Color(0xFF1A237E).withOpacity(0.1), width: 2),
+                  border: Border.all(
+                      color: const Color(0xFF1A237E).withOpacity(0.1),
+                      width: 2),
                 ),
                 child: CircleAvatar(
                   radius: 30,
@@ -178,19 +324,29 @@ class HomeScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(mentor["name"], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF1A237E))),
+                    Text(mentor["name"],
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Color(0xFF1A237E))),
                     const SizedBox(height: 2),
-                    Text("${mentor["major"]} • ${mentor["campus"]}", style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                    Text("${mentor["major"]} • ${mentor["campus"]}",
+                        style:
+                            TextStyle(fontSize: 12, color: Colors.grey[600])),
                     const SizedBox(height: 5),
                     Row(
                       children: [
                         const Icon(Icons.star, color: Colors.orange, size: 14),
                         const SizedBox(width: 4),
-                        const Text("4.9 (120 Ulasan)", style: TextStyle(fontSize: 11, color: Colors.grey)),
+                        const Text("4.9 (120 Ulasan)",
+                            style: TextStyle(fontSize: 11, color: Colors.grey)),
                         const Spacer(),
                         Text(
                           "Rp ${mentor["price"]}",
-                          style: const TextStyle(color: Color(0xFF1A237E), fontWeight: FontWeight.bold, fontSize: 15),
+                          style: const TextStyle(
+                              color: Color(0xFF1A237E),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15),
                         ),
                       ],
                     ),
@@ -210,12 +366,20 @@ class HomeScreen extends StatelessWidget {
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     side: const BorderSide(color: Color(0xFF1A237E)),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
                   ),
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => MentorDetailScreen(mentor: mentor)));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) =>
+                                MentorDetailScreen(mentor: mentor)));
                   },
-                  child: const Text("Lihat Detail", style: TextStyle(color: Color(0xFF1A237E), fontWeight: FontWeight.bold)),
+                  child: const Text("Lihat Detail",
+                      style: TextStyle(
+                          color: Color(0xFF1A237E),
+                          fontWeight: FontWeight.bold)),
                 ),
               ),
               const SizedBox(width: 12),
@@ -226,10 +390,12 @@ class HomeScreen extends StatelessWidget {
                     backgroundColor: const Color(0xFF1A237E),
                     foregroundColor: Colors.white,
                     elevation: 0,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
                   ),
                   onPressed: () => onBooking(mentor),
-                  child: const Text("Booking Sekarang", style: TextStyle(fontWeight: FontWeight.bold)),
+                  child: const Text("Booking Sekarang",
+                      style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
               ),
             ],

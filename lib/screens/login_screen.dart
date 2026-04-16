@@ -9,7 +9,6 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-
   final _formKey = GlobalKey<FormState>();
 
   bool obscure = true;
@@ -20,7 +19,6 @@ class _LoginScreenState extends State<LoginScreen> {
       resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
-
           /// BACKGROUND ATAS
           Positioned(
             top: -40,
@@ -105,11 +103,17 @@ class _LoginScreenState extends State<LoginScreen> {
                       key: _formKey,
                       child: Column(
                         children: [
-
                           /// EMAIL
                           TextFormField(
-                            validator: (value) =>
-                                value!.isEmpty ? "Wajib diisi" : null,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "Email wajib diisi";
+                              }
+                              if (!value.endsWith("@gmail.com")) {
+                                return "Email harus menggunakan @gmail.com";
+                              }
+                              return null;
+                            },
                             decoration: InputDecoration(
                               hintText: "Email",
                               filled: true,
@@ -126,8 +130,15 @@ class _LoginScreenState extends State<LoginScreen> {
                           /// PASSWORD
                           TextFormField(
                             obscureText: obscure,
-                            validator: (value) =>
-                                value!.isEmpty ? "Wajib diisi" : null,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "Password wajib diisi";
+                              }
+                              if (value.length < 8) {
+                                return "Password salah";
+                              }
+                              return null;
+                            },
                             decoration: InputDecoration(
                               hintText: "Password",
                               filled: true,
@@ -161,13 +172,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     padding: const EdgeInsets.only(bottom: 70), // 🔥 posisi pas
                     child: GestureDetector(
                       onTap: () {
-  if (_formKey.currentState!.validate()) {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const MainScreen()),
-    );
-  }
-},
+                        if (_formKey.currentState!.validate()) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const MainScreen()),
+                          );
+                        }
+                      },
                       child: Container(
                         height: 56,
                         width: double.infinity,

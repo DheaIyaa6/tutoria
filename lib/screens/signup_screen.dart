@@ -26,7 +26,6 @@ class _SignupScreenState extends State<SignupScreen> {
       resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
-
           /// BACKGROUND ATAS
           Positioned(
             top: -40,
@@ -55,7 +54,6 @@ class _SignupScreenState extends State<SignupScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Column(
                 children: [
-
                   const SizedBox(height: 10),
 
                   /// BACK BUTTON
@@ -111,11 +109,17 @@ class _SignupScreenState extends State<SignupScreen> {
                       key: _formKey,
                       child: Column(
                         children: [
-
                           /// EMAIL
                           TextFormField(
-                            validator: (value) =>
-                                value!.isEmpty ? "Wajib diisi" : null,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "Email wajib diisi";
+                              }
+                              if (!value.endsWith("@gmail.com")) {
+                                return "Email harus menggunakan @gmail.com";
+                              }
+                              return null;
+                            },
                             decoration: InputDecoration(
                               hintText: "Email",
                               filled: true,
@@ -132,8 +136,15 @@ class _SignupScreenState extends State<SignupScreen> {
                           /// PASSWORD
                           TextFormField(
                             obscureText: obscure,
-                            validator: (value) =>
-                                value!.isEmpty ? "Wajib diisi" : null,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "Password wajib diisi";
+                              }
+                              if (value.length < 8) {
+                                return "Minimal password 8 karakter";
+                              }
+                              return null;
+                            },
                             decoration: InputDecoration(
                               hintText: "Password",
                               filled: true,
