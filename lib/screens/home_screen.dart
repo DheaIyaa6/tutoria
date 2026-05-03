@@ -1,10 +1,23 @@
 import 'package:flutter/material.dart';
 import 'mentor_detail_screen.dart';
+import 'checkout_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   final Function(Map<String, dynamic>) onBooking;
-  const HomeScreen({super.key, required this.onBooking});
 
+  const HomeScreen({
+    super.key,
+    required this.onBooking,
+  });
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  TextEditingController searchController = TextEditingController();
+
+  String searchQuery = "";
   @override
   Widget build(BuildContext context) {
     // DATA MENTOR LENGKAP - 12 Mentor (Format Flat/Horizontal per baris)
@@ -118,6 +131,11 @@ class HomeScreen extends StatelessWidget {
         "experience": "10 Tahun Profesional Aktor"
       },
     ];
+    final filteredMentors = mentors.where((mentor) {
+      return mentor["name"].toLowerCase().contains(searchQuery) ||
+          mentor["major"].toLowerCase().contains(searchQuery) ||
+          mentor["subjects"].join(" ").toLowerCase().contains(searchQuery);
+    }).toList();
 
     return Scaffold(
       backgroundColor: const Color(0xFFF7F8FC),
@@ -184,7 +202,13 @@ class HomeScreen extends StatelessWidget {
                         offset: const Offset(0, 5))
                   ],
                 ),
-                child: const TextField(
+                child: TextField(
+                  controller: searchController,
+                  onChanged: (value) {
+                    setState(() {
+                      searchQuery = value.toLowerCase();
+                    });
+                  },
                   decoration: InputDecoration(
                     hintText: "Cari mata pelajaran atau mentor...",
                     hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
@@ -194,6 +218,24 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
               ),
+              const SizedBox(height: 25),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: ["Flutter", "Business", "Medical", "Language", "Law"]
+                    .map((keyword) {
+                  return ActionChip(
+                    label: Text(keyword),
+                    onPressed: () {
+                      setState(() {
+                        searchController.text = keyword;
+                        searchQuery = keyword.toLowerCase();
+                      });
+                    },
+                  );
+                }).toList(),
+              ),
+
               const SizedBox(height: 25),
 
               // --- SECTION 4: HERO BANNER ---
@@ -271,9 +313,9 @@ class HomeScreen extends StatelessWidget {
               ListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                itemCount: mentors.length,
+                itemCount: filteredMentors.length,
                 itemBuilder: (context, index) {
-                  final mentor = mentors[index];
+                  final mentor = filteredMentors[index];
                   return _buildMentorCard(context, mentor);
                 },
               ),
@@ -393,7 +435,20 @@ class HomeScreen extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12)),
                   ),
-                  onPressed: () => onBooking(mentor),
+                  onPressed: () async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => CheckoutScreen(
+                          mentor: mentor,
+                        ),
+                      ),
+                    );
+
+                    if (result == true) {
+                      widget.onBooking(mentor);
+                    }
+                  },
                   child: const Text("Booking Sekarang",
                       style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
