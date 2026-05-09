@@ -1,27 +1,67 @@
 import 'package:flutter/material.dart';
-import 'complete_profile_screen.dart';
+import 'package:flutter/services.dart';
+import 'login_screen.dart';
 
-class SignupScreen extends StatefulWidget {
-  const SignupScreen({super.key});
+class CompleteProfileScreen extends StatefulWidget {
+  const CompleteProfileScreen({super.key});
 
   @override
-  State<SignupScreen> createState() => _SignupScreenState();
+  State<CompleteProfileScreen> createState() => _CompleteProfileScreenState();
 }
 
-class _SignupScreenState extends State<SignupScreen> {
+class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  bool obscure = true;
+  final phoneController = TextEditingController();
+  final schoolController = TextEditingController();
+  final classController = TextEditingController();
+  final birthdayController = TextEditingController();
 
-  void signup() {
+  void createAccount() {
     if (_formKey.currentState!.validate()) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const CompleteProfileScreen(),
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Account created successfully"),
         ),
       );
+
+      Future.delayed(const Duration(seconds: 1), () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const LoginScreen(),
+          ),
+        );
+      });
     }
+  }
+
+  Future<void> pickDate() async {
+    DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime(2007),
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(),
+    );
+
+    if (pickedDate != null) {
+      setState(() {
+        birthdayController.text =
+            "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
+      });
+    }
+  }
+
+  InputDecoration customInput(String hint) {
+    return InputDecoration(
+      hintText: hint,
+      filled: true,
+      fillColor: const Color(0xFFF4F7FB),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide.none,
+      ),
+    );
   }
 
   @override
@@ -40,7 +80,7 @@ class _SignupScreenState extends State<SignupScreen> {
             ),
           ),
 
-          /// BACKGROUND BAWAH (FIX NEMPEL)
+          /// BACKGROUND BAWAH
           Positioned(
             bottom: 0,
             left: 0,
@@ -52,7 +92,6 @@ class _SignupScreenState extends State<SignupScreen> {
             ),
           ),
 
-          /// CONTENT
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -84,16 +123,16 @@ class _SignupScreenState extends State<SignupScreen> {
 
                   const SizedBox(height: 20),
 
-                  /// GAMBAR UTAMA (BEDA DI SINI)
+                  /// ILLUSTRATION
                   Image.asset(
                     'assets/images/signuporang.png',
-                    height: 180,
+                    height: 140,
                   ),
 
                   const SizedBox(height: 20),
 
                   const Text(
-                    "Create Account",
+                    "Complete Profile",
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -102,7 +141,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
                   const SizedBox(height: 20),
 
-                  /// FORM
+                  /// FORM CARD
                   Container(
                     padding: const EdgeInsets.all(18),
                     decoration: BoxDecoration(
@@ -113,79 +152,74 @@ class _SignupScreenState extends State<SignupScreen> {
                       key: _formKey,
                       child: Column(
                         children: [
+                          /// PHONE
                           TextFormField(
+                            controller: phoneController,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                            ],
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return "Nama wajib diisi";
+                                return "Phone number wajib diisi";
                               }
                               return null;
                             },
-                            decoration: InputDecoration(
-                              hintText: "Full Name",
-                              filled: true,
-                              fillColor: const Color(0xFFF4F7FB),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(14),
-                                borderSide: BorderSide.none,
-                              ),
+                            decoration: customInput(
+                              "Phone Number",
                             ),
                           ),
 
                           const SizedBox(height: 14),
 
-                          /// EMAIL
+                          /// SCHOOL
                           TextFormField(
+                            controller: schoolController,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return "Email wajib diisi";
-                              }
-                              if (!value.endsWith("@gmail.com")) {
-                                return "Email harus menggunakan @gmail.com";
+                                return "School wajib diisi";
                               }
                               return null;
                             },
-                            decoration: InputDecoration(
-                              hintText: "Email",
-                              filled: true,
-                              fillColor: const Color(0xFFF4F7FB),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(14),
-                                borderSide: BorderSide.none,
-                              ),
+                            decoration: customInput(
+                              "School",
                             ),
                           ),
 
                           const SizedBox(height: 14),
 
-                          /// PASSWORD
+                          /// CLASS
                           TextFormField(
-                            obscureText: obscure,
+                            controller: classController,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return "Password wajib diisi";
-                              }
-                              if (value.length < 8) {
-                                return "Minimal password 8 karakter";
+                                return "Class wajib diisi";
                               }
                               return null;
                             },
-                            decoration: InputDecoration(
-                              hintText: "Password",
-                              filled: true,
-                              fillColor: const Color(0xFFF4F7FB),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(14),
-                                borderSide: BorderSide.none,
-                              ),
-                              suffixIcon: IconButton(
-                                icon: Icon(obscure
-                                    ? Icons.visibility_off
-                                    : Icons.visibility),
-                                onPressed: () {
-                                  setState(() {
-                                    obscure = !obscure;
-                                  });
-                                },
+                            decoration: customInput(
+                              "Class",
+                            ),
+                          ),
+
+                          const SizedBox(height: 14),
+
+                          /// BIRTHDAY
+                          TextFormField(
+                            controller: birthdayController,
+                            readOnly: true,
+                            onTap: pickDate,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "Birthday wajib diisi";
+                              }
+                              return null;
+                            },
+                            decoration: customInput(
+                              "Birthday",
+                            ).copyWith(
+                              suffixIcon: const Icon(
+                                Icons.calendar_today,
                               ),
                             ),
                           ),
@@ -194,26 +228,28 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                   ),
 
-                  /// BIAR BUTTON POSISI PAS
                   const Spacer(),
 
-                  /// SIGN UP BUTTON
+                  /// CREATE ACCOUNT BUTTON
                   Padding(
                     padding: const EdgeInsets.only(bottom: 70),
                     child: GestureDetector(
-                      onTap: signup,
+                      onTap: createAccount,
                       child: Container(
                         height: 56,
                         width: double.infinity,
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
-                            colors: [Color(0xFF42A5F5), Color(0xFF1E88E5)],
+                            colors: [
+                              Color(0xFF42A5F5),
+                              Color(0xFF1E88E5),
+                            ],
                           ),
                           borderRadius: BorderRadius.circular(18),
                         ),
                         child: const Center(
                           child: Text(
-                            "NEXT",
+                            "CREATE ACCOUNT",
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.w600,

@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'mentor_detail_screen.dart';
 import 'checkout_screen.dart';
+import 'notification_screen.dart';
+import 'package:carousel_slider/carousel_slider.dart';
+import 'voucher_screen.dart';
+import 'favorite_mentor_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final Function(Map<String, dynamic>) onBooking;
@@ -29,6 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
         "price": 50000,
         "image": "https://randomuser.me/api/portraits/women/1.jpg",
         "subjects": ["Flutter", "Dart", "UI/UX"],
+        "isFavorite": false,
         "experience": "3 Tahun Mobile Developer"
       },
       {
@@ -38,6 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
         "price": 60000,
         "image": "https://randomuser.me/api/portraits/men/2.jpg",
         "subjects": ["Java", "Spring Boot", "SQL"],
+        "isFavorite": false,
         "experience": "2 Tahun Backend Engineer"
       },
       {
@@ -47,6 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
         "price": 45000,
         "image": "https://randomuser.me/api/portraits/women/3.jpg",
         "subjects": ["Marketing", "Business Plan"],
+        "isFavorite": false,
         "experience": "4 Tahun Business Consultant"
       },
       {
@@ -56,6 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
         "price": 70000,
         "image": "https://randomuser.me/api/portraits/men/4.jpg",
         "subjects": ["Anatomi", "Biologi"],
+        "isFavorite": false,
         "experience": "1 Tahun Dokter Muda"
       },
       {
@@ -65,6 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
         "price": 40000,
         "image": "https://randomuser.me/api/portraits/women/5.jpg",
         "subjects": ["Aljabar", "Kalkulus"],
+        "isFavorite": false,
         "experience": "2 Tahun Pengajar Olimpiade"
       },
       {
@@ -74,6 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
         "price": 65000,
         "image": "https://randomuser.me/api/portraits/men/6.jpg",
         "subjects": ["Robotika", "IoT"],
+        "isFavorite": false,
         "experience": "3 Tahun Embedded Engineer"
       },
       {
@@ -83,6 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
         "price": 35000,
         "image": "https://randomuser.me/api/portraits/women/7.jpg",
         "subjects": ["TOEFL", "IELTS"],
+        "isFavorite": false,
         "experience": "2 Tahun English Tutor"
       },
       {
@@ -92,6 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
         "price": 55000,
         "image": "https://randomuser.me/api/portraits/men/8.jpg",
         "subjects": ["Hukum Pidana", "Perdata"],
+        "isFavorite": false,
         "experience": "2 Tahun Junior Lawyer"
       },
       {
@@ -101,6 +113,7 @@ class _HomeScreenState extends State<HomeScreen> {
         "price": 48000,
         "image": "https://randomuser.me/api/portraits/women/9.jpg",
         "subjects": ["Konseling", "Psikologi Anak"],
+        "isFavorite": false,
         "experience": "3 Tahun Konselor Sekolah"
       },
       {
@@ -110,6 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
         "price": 75000,
         "image": "https://randomuser.me/api/portraits/men/10.jpg",
         "subjects": ["Unity", "C#"],
+        "isFavorite": false,
         "experience": "2 Tahun Game Designer"
       },
       {
@@ -119,6 +133,7 @@ class _HomeScreenState extends State<HomeScreen> {
         "price": 42000,
         "image": "https://randomuser.me/api/portraits/women/11.jpg",
         "subjects": ["Public Speaking", "PR"],
+        "isFavorite": false,
         "experience": "4 Tahun PR Specialist"
       },
       {
@@ -128,6 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
         "price": 90000,
         "image": "https://randomuser.me/api/portraits/men/12.jpg",
         "subjects": ["Akting", "Teater"],
+        "isFavorite": false,
         "experience": "10 Tahun Profesional Aktor"
       },
     ];
@@ -136,6 +152,30 @@ class _HomeScreenState extends State<HomeScreen> {
           mentor["major"].toLowerCase().contains(searchQuery) ||
           mentor["subjects"].join(" ").toLowerCase().contains(searchQuery);
     }).toList();
+    final List<Map<String, dynamic>> banners = [
+      {
+        "title": "Diskon 50% Booking Pertama",
+        "route": () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const VoucherScreen(),
+            ),
+          );
+        }
+      },
+      {
+        "title": "Cek Mentor Favoritmu",
+        "route": () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const FavoriteMentorScreen(),
+            ),
+          );
+        }
+      }
+    ];
 
     return Scaffold(
       backgroundColor: const Color(0xFFF7F8FC),
@@ -161,13 +201,27 @@ class _HomeScreenState extends State<HomeScreen> {
                             fontSize: 26,
                             color: Color(0xFF1A237E))),
                   ),
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const NotificationScreen(),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(10)),
-                    child: const Icon(Icons.notifications_none_rounded,
-                        size: 28, color: Color(0xFF1A237E)),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(
+                        Icons.notifications_none_rounded,
+                        size: 28,
+                        color: Color(0xFF1A237E),
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -239,73 +293,78 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 25),
 
               // --- SECTION 4: HERO BANNER ---
-              Container(
-                height: 180,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  image: const DecorationImage(
-                    image: AssetImage('assets/images/laptop.jpg'),
-                    fit: BoxFit.cover,
-                  ),
+              // --- SECTION 4: HERO BANNER ---
+              CarouselSlider(
+                options: CarouselOptions(
+                  height: 160,
+                  autoPlay: true,
+                  autoPlayInterval: const Duration(seconds: 3),
+                  enlargeCenterPage: true,
+                  viewportFraction: 1,
                 ),
-                child: Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    gradient: LinearGradient(
-                      begin: Alignment.bottomRight,
-                      colors: [
-                        Colors.black.withOpacity(0.8),
-                        Colors.transparent
-                      ],
-                    ),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 5),
-                        decoration: BoxDecoration(
-                            color: Colors.orange,
-                            borderRadius: BorderRadius.circular(8)),
-                        child: const Text("PROMO KHUSUS",
+                items: banners.map((banner) {
+                  return GestureDetector(
+                    onTap: () {
+                      banner["route"]();
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      margin: const EdgeInsets.symmetric(horizontal: 5),
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        gradient: const LinearGradient(
+                          colors: [
+                            Color(0xFF42A5F5),
+                            Color(0xFF1A237E),
+                          ],
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            "PROMO KHUSUS",
                             style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold)),
+                              color: Colors.white70,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            banner["title"],
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          const Text(
+                            "Klik untuk lihat detail",
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        "Dapatkan Diskon 50%\nUntuk Booking Pertama!",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            height: 1.2),
-                      ),
-                    ],
-                  ),
-                ),
+                    ),
+                  );
+                }).toList(),
               ),
               const SizedBox(height: 30),
 
               // --- SECTION 5: TITLE LIST ---
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text("Recommended Mentor",
-                      style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF1A237E))),
-                  TextButton(
-                      onPressed: () {},
-                      child: const Text("Lihat Semua",
-                          style: TextStyle(color: Colors.blue))),
-                ],
+
+              const Text(
+                "Rekomendasi Mentor",
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF1A237E)),
               ),
               const SizedBox(height: 10),
 
@@ -347,52 +406,96 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         children: [
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                      color: const Color(0xFF1A237E).withOpacity(0.1),
-                      width: 2),
-                ),
-                child: CircleAvatar(
-                  radius: 30,
-                  backgroundColor: Colors.grey[200],
-                  backgroundImage: NetworkImage(mentor["image"]),
-                ),
-              ),
-              const SizedBox(width: 15),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(mentor["name"],
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: Color(0xFF1A237E))),
-                    const SizedBox(height: 2),
-                    Text("${mentor["major"]} • ${mentor["campus"]}",
-                        style:
-                            TextStyle(fontSize: 12, color: Colors.grey[600])),
-                    const SizedBox(height: 5),
-                    Row(
-                      children: [
-                        const Icon(Icons.star, color: Colors.orange, size: 14),
-                        const SizedBox(width: 4),
-                        const Text("4.9 (120 Ulasan)",
-                            style: TextStyle(fontSize: 11, color: Colors.grey)),
-                        const Spacer(),
-                        Text(
-                          "Rp ${mentor["price"]}",
-                          style: const TextStyle(
-                              color: Color(0xFF1A237E),
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15),
-                        ),
-                      ],
+              Row(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: const Color(0xFF1A237E).withOpacity(0.1),
+                        width: 2,
+                      ),
                     ),
-                  ],
+                    child: CircleAvatar(
+                      radius: 30,
+                      backgroundImage: NetworkImage(
+                        mentor["image"],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 15),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        mentor["name"],
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Text(
+                        "${mentor["major"]} • ${mentor["campus"]}",
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.star,
+                            color: Colors.orange,
+                            size: 16,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            "4.9 (120 ulasan)",
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 8),
+
+                      Text(
+                        "Rp ${mentor["price"]}",
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Color(0xFF1A237E),
+                        ),
+                      ),
+// PENUTUP COLUMN KIRI
+                    ],
+                  ),
+                ],
+              ),
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                    mentor["isFavorite"] = !mentor["isFavorite"];
+                  });
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        mentor["isFavorite"]
+                            ? "${mentor["name"]} added to favorites ❤️"
+                            : "${mentor["name"]} removed from favorites",
+                      ),
+                    ),
+                  );
+                },
+                icon: Icon(
+                  mentor["isFavorite"] ? Icons.favorite : Icons.favorite_border,
+                  color: mentor["isFavorite"] ? Colors.red : Colors.grey,
                 ),
               ),
             ],
