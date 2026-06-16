@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "590179179605",
+    "project_id": "tutoria-5367d",
+    "storage_bucket": "tutoria-5367d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:590179179605:android:36c56e6c1ae549b38448dc",
+        "android_client_info": {
+          "package_name": "com.example.tutoria"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBpCJacq6A4SQSv_b9Aq8PuOpAv5vT0vkQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

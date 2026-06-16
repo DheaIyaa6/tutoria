@@ -1,9 +1,13 @@
-// main.dart
 import 'package:flutter/material.dart';
-import 'package:tutoria/screens/splash_screen.dart'; // <--- Pastikan import ini ada
+import 'package:firebase_core/firebase_core.dart'; // 1. Wajib tambahkan import ini paling atas!
+import 'screens/splash_screen.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  // 2. Wajib tambahkan 2 baris ini agar Firebase-mu inisialisasi duluan sebelum aplikasi jalan
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+
+  runApp(const MyApp()); // 3. Pastikan "MyApp()" ini sesuai dengan nama class utama aplikasimu ya!
 }
 
 class MyApp extends StatelessWidget {

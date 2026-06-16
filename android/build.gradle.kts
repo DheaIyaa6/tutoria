@@ -1,3 +1,8 @@
+plugins {
+    // Menambahkan plugin Google Services untuk membaca file JSON Firebase
+    id("com.google.gms.google-services") version "4.4.4" apply false
+}
+
 allprojects {
     repositories {
         google()

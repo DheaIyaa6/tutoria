@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http; 
+import 'dart:convert'; 
 import 'login_screen.dart';
 
 class CompleteProfileScreen extends StatefulWidget {
-  const CompleteProfileScreen({super.key});
+  final String? selectedRole;
+
+  const CompleteProfileScreen({super.key, this.selectedRole});
 
   @override
   State<CompleteProfileScreen> createState() => _CompleteProfileScreenState();
@@ -17,22 +21,71 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   final classController = TextEditingController();
   final birthdayController = TextEditingController();
 
-  void createAccount() {
+  // 2. Fungsi untuk mengirim semua data ke Laragon
+  Future<void> createAccount() async {
     if (_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Account created successfully"),
-        ),
+      
+      // Tampilkan loading indicator biar user tahu data sedang diproses
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => const Center(child: CircularProgressIndicator()),
       );
 
-      Future.delayed(const Duration(seconds: 1), () {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => const LoginScreen(),
-          ),
+      try { 
+        // 10.0.2.2 adalah IP khusus Android Emulator untuk membaca localhost laptop)
+        var url = Uri.parse("http://10.0.2.2/tutoria_api/register.php");
+
+        // Kirim data dalam bentuk paket JSON sesuai kolom tabel MySQL kemarin
+        var response = await http.post(
+          url,
+          headers: {"Content-Type": "application/json"},
+          body: jsonEncode({
+            "full_name": "User Baru", 
+            "email": "user${DateTime.now().millisecondsSinceEpoch}@mail.com", // Digenerate otomatis biar tidak duplikat saat testing
+            "password": "password123", 
+            "role": widget.selectedRole ?? "student", // Menggunakan role yang dioper
+            "school_level": schoolController.text, // Mengambil inputan dari form school
+            "school_class": classController.text, // Mengambil inputan dari form class
+            "interest": "Belum ditentukan"
+          }),
         );
-      });
+
+        // Tutup dialog loading
+        if (mounted) Navigator.pop(context);
+
+        var dataRespon = jsonDecode(response.body);
+
+        if (dataRespon['status'] == 'success') {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Akun Berhasil Tersimpan di Laragon!")),
+            );
+
+            Future.delayed(const Duration(seconds: 1), () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const LoginScreen()),
+              );
+            });
+          }
+        } else {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Gagal: ${dataRespon['message']}")),
+            );
+          }
+        }
+      } catch (e) {
+        // Tutup dialog loading jika error
+        if (mounted) Navigator.pop(context);
+        
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Error Koneksi: Pastikan Laragon sudah Start All ($e)")),
+          );
+        }
+      }
     }
   }
 
