@@ -293,9 +293,12 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: 14),
 
-              // STREAMBUILDER JADWAL DARI FIRESTORE
+              // 🔥 STREAMBUILDER FIX: Memfilter real-time jadwal yang berstatus 'available' saja
               StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance.collection('schedules').snapshots(),
+                stream: FirebaseFirestore.instance
+                    .collection('schedules')
+                    .where('status', isEqualTo: 'available') // 👈 Mengunci agar yang booked langsung hilang otomatis
+                    .snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator(color: Color(0xFF1A237E)));
@@ -303,8 +306,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                     return const Center(
                       child: Padding(
-                        padding: EdgeInsets.only(top: 20),
-                        child: Text("Belum ada jadwal mengajar dari mentor.", style: TextStyle(color: Colors.grey)),
+                        padding: EdgeInsets.only(top: 40, bottom: 40),
+                        child: Text("Belum ada jadwal mengajar aktif saat ini.", style: TextStyle(color: Colors.grey)),
                       ),
                     );
                   }
@@ -319,24 +322,20 @@ class _HomeScreenState extends State<HomeScreen> {
                       var scheduleData = rawSchedules[index].data() as Map<String, dynamic>;
                       String mentorId = scheduleData['mentor_id'] ?? '';
 
-                      // FutureBuilder untuk menarik detail profil dari collection 'users'
                       return FutureBuilder<DocumentSnapshot>(
                         future: FirebaseFirestore.instance.collection('users').doc(mentorId).get(),
                         builder: (context, mentorSnapshot) {
                           if (mentorSnapshot.connectionState == ConnectionState.waiting) {
-                            return const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 8.0),
-                              child: Center(child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))),
-                            );
+                            return const SizedBox.shrink(); 
                           }
 
                           if (!mentorSnapshot.hasData || !mentorSnapshot.data!.exists) {
-                            return const SizedBox.shrink(); // Lewati jika data mentor tidak ditemukan
+                            return const SizedBox.shrink(); 
                           }
 
                           var mentorData = mentorSnapshot.data!.data() as Map<String, dynamic>;
 
-                          // MAPPING DATA GABUNGAN (Menggunakan 'full_name' sesuai Firestore abang)
+                          // MAPPING DATA GABUNGAN AMAN
                           Map<String, dynamic> combinedData = {
                             "name": mentorData["full_name"] ?? "Nama Tidak Ditemukan",
                             "major": mentorData["major"] ?? "-",
@@ -408,7 +407,6 @@ class _HomeScreenState extends State<HomeScreen> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Foto Profil Mentor
               ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: data["image"] != null && data["image"].toString().startsWith("http")
@@ -441,7 +439,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(height: 8),
                     
-                    // INFORMASI WAKTU LES (TANGGAL & JAM)
                     Row(
                       children: [
                         const Icon(Icons.calendar_today_rounded, size: 14, color: Colors.deepPurple),
@@ -471,7 +468,6 @@ class _HomeScreenState extends State<HomeScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Harga Sesi Tergantung yang Diinput Mentor
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -484,7 +480,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               Row(
                 children: [
-                  // BUTTON DETAIL MENTOR (Kirim data objek super lengkap untuk halaman detail)
                   TextButton(
                     style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10)),
                     onPressed: () {
@@ -499,7 +494,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(width: 4),
                   
-                  // BUTTON BOOKING
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),

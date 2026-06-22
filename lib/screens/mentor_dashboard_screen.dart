@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:tutoria/screens/login_screen.dart';
-import 'package:tutoria/screens/mentor_schedule_screen.dart'; // JALUR IMPORT ABSOLUT RESMI 🚀
+import 'package:tutoria/screens/mentor_schedule_screen.dart'; 
+import 'package:tutoria/screens/student_list_screen.dart';
 
 class MentorDashboardScreen extends StatefulWidget {
   const MentorDashboardScreen({super.key});
@@ -167,7 +168,7 @@ class _MentorDashboardScreenState extends State<MentorDashboardScreen> {
                               onTap: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (_) => MentorScheduleScreen()),
+                                  MaterialPageRoute(builder: (_) => const MentorScheduleScreen()),
                                 );
                               },
                             ),
@@ -177,8 +178,10 @@ class _MentorDashboardScreenState extends State<MentorDashboardScreen> {
                               label: "Daftar\nSiswa", 
                               color: Colors.purple,
                               onTap: () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Fitur Daftar Siswa dalam pengembangan.")),
+                                // 🔥 KODE SUDAH AKTIF: Navigasi real-time langsung ke halaman daftar siswa
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (_) => const StudentListScreen()),
                                 );
                               },
                             ),

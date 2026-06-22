@@ -13,11 +13,10 @@ class _MentorScheduleScreenState extends State<MentorScheduleScreen> {
   final User? currentUser = FirebaseAuth.instance.currentUser;
   final _formKey = GlobalKey<FormState>();
   
-  // Controller Input Form (noteController sudah didaftarkan di sini agar tidak error)
   final dayController = TextEditingController(); 
   final timeController = TextEditingController();
   final priceController = TextEditingController(); 
-  final noteController = TextEditingController(); // <-- FIX: Ditambahkan agar tidak error lookup
+  final noteController = TextEditingController(); 
 
   DateTime? _selectedDate;
 
@@ -26,7 +25,7 @@ class _MentorScheduleScreenState extends State<MentorScheduleScreen> {
     dayController.dispose();
     timeController.dispose();
     priceController.dispose();
-    noteController.dispose(); // <-- Jangan lupa di-dispose juga
+    noteController.dispose(); 
     super.dispose();
   }
 
@@ -38,7 +37,8 @@ class _MentorScheduleScreenState extends State<MentorScheduleScreen> {
           'day': dayController.text.trim(), 
           'time': timeController.text.trim(),
           'price': priceController.text.trim(), 
-          'note': noteController.text.trim(), // <-- Menyimpan input catatan tambahan ke Firestore
+          'note': noteController.text.trim(), 
+          'status': 'available', 
           'created_at': FieldValue.serverTimestamp(),
         });
 
@@ -47,7 +47,7 @@ class _MentorScheduleScreenState extends State<MentorScheduleScreen> {
           dayController.clear();
           timeController.clear();
           priceController.clear();
-          noteController.clear(); // Bersihkan field setelah simpan
+          noteController.clear(); 
           _selectedDate = null; 
           
           ScaffoldMessenger.of(context).showSnackBar(
@@ -58,9 +58,11 @@ class _MentorScheduleScreenState extends State<MentorScheduleScreen> {
           );
         }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Gagal menambah jadwal: $e"), backgroundColor: Colors.red),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Gagal menambah jadwal: $e"), backgroundColor: Colors.red),
+          );
+        }
       }
     }
   }
@@ -94,8 +96,6 @@ class _MentorScheduleScreenState extends State<MentorScheduleScreen> {
                       style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.deepPurple),
                     ),
                     const SizedBox(height: 18),
-                    
-                    // FIELD TANGGAL
                     TextFormField(
                       controller: dayController,
                       readOnly: true, 
@@ -119,11 +119,9 @@ class _MentorScheduleScreenState extends State<MentorScheduleScreen> {
                           });
                         }
                       },
-                      validator: (v) => v!.isEmpty ? "Tanggal belajar tidak boleh kosong" : null,
+                      validator: (v) => v == null || v.isEmpty ? "Tanggal belajar tidak boleh kosong" : null,
                     ),
                     const SizedBox(height: 12),
-                    
-                    // FIELD JAM
                     TextFormField(
                       controller: timeController,
                       decoration: const InputDecoration(
@@ -131,11 +129,9 @@ class _MentorScheduleScreenState extends State<MentorScheduleScreen> {
                         border: OutlineInputBorder(),
                         prefixIcon: Icon(Icons.access_time),
                       ),
-                      validator: (v) => v!.isEmpty ? "Jam tidak boleh kosong" : null,
+                      validator: (v) => v == null || v.isEmpty ? "Jam tidak boleh kosong" : null,
                     ),
                     const SizedBox(height: 12),
-                    
-                    // FIELD HARGA
                     TextFormField(
                       controller: priceController,
                       keyboardType: TextInputType.number, 
@@ -145,11 +141,9 @@ class _MentorScheduleScreenState extends State<MentorScheduleScreen> {
                         prefixIcon: Icon(Icons.payments_outlined),
                         hintText: "Contoh: 50000",
                       ),
-                      validator: (v) => v!.isEmpty ? "Harga tidak boleh kosong" : null,
+                      validator: (v) => v == null || v.isEmpty ? "Harga tidak boleh kosong" : null,
                     ),
                     const SizedBox(height: 12),
-
-                    // FIELD CATATAN TAMBAHAN (Sesuai dengan UI gambar abang)
                     TextFormField(
                       controller: noteController,
                       decoration: const InputDecoration(
@@ -159,7 +153,6 @@ class _MentorScheduleScreenState extends State<MentorScheduleScreen> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    
                     SizedBox(
                       width: double.infinity,
                       height: 50,
@@ -176,7 +169,7 @@ class _MentorScheduleScreenState extends State<MentorScheduleScreen> {
                 ),
               ),
             );
-          }
+          },
         );
       },
     );
@@ -197,6 +190,7 @@ class _MentorScheduleScreenState extends State<MentorScheduleScreen> {
               stream: FirebaseFirestore.instance
                   .collection('schedules')
                   .where('mentor_id', isEqualTo: currentUser!.uid)
+                  .where('status', isEqualTo: 'available') // 🔥 HANYA MENGUBAH BARIS INI (Filter status)
                   .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -241,6 +235,7 @@ class _MentorScheduleScreenState extends State<MentorScheduleScreen> {
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            const SizedBox(height: 4),
                             Text(
                               data['price'] != null && data['price'].toString().isNotEmpty
                                   ? "Tarif: Rp ${data['price']}"
@@ -259,8 +254,8 @@ class _MentorScheduleScreenState extends State<MentorScheduleScreen> {
                         ),
                         trailing: IconButton(
                           icon: const Icon(Icons.delete_sweep, color: Colors.redAccent),
-                          onPressed: () {
-                            FirebaseFirestore.instance.collection('schedules').doc(docId).delete();
+                          onPressed: () async {
+                            await FirebaseFirestore.instance.collection('schedules').doc(docId).delete();
                           },
                         ),
                       ),

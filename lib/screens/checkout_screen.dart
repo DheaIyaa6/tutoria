@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'transaction_detail_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // 🔥 Mengambil UID Student aktif
 
 class CheckoutScreen extends StatefulWidget {
   final Map<String, dynamic> mentor;
@@ -8,7 +9,7 @@ class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({
     super.key,
     required this.mentor,
-    this.onBooking, // 
+    this.onBooking,
   });
 
   @override
@@ -16,271 +17,320 @@ class CheckoutScreen extends StatefulWidget {
 }
 
 class _CheckoutScreenState extends State<CheckoutScreen> {
-  String selectedPayment = "DANA";
+  bool _isLoading = false;
 
-  final List<Map<String, dynamic>> paymentMethods = [
-    {"id": "DANA", "name": "DANA Wallet", "icon": Icons.account_balance_wallet_rounded, "color": Colors.blue},
-    {"id": "OVO", "name": "OVO Cash", "icon": Icons.wallet_membership_rounded, "color": Colors.purple},
-    {"id": "QRIS", "name": "QRIS (Gopay/ShopeePay/dll)", "icon": Icons.qr_code_2_rounded, "color": Colors.red},
-  ];
+  // Fungsi untuk memformat mata uang secara manual (aman tanpa int.parse yang menyebabkan crash)
+  String _formatCurrency(dynamic value) {
+    if (value == null) return "Rp 0";
+    String digits = value.toString().replaceAll(RegExp(r'\D'), '');
+    if (digits.isEmpty) return "Rp 0";
+    
+    final chars = digits.split('');
+    String result = '';
+    int count = 0;
+    
+    for (int i = chars.length - 1; i >= 0; i--) {
+      result = chars[i] + result;
+      count++;
+      if (count % 3 == 0 && i != 0) {
+        result = '.$result';
+      }
+    }
+    return 'Rp $result';
+  }
 
-  @override
-  Widget build(BuildContext context) {
-    final int serviceFee = 5000;
-    final int total = widget.mentor["price"] + serviceFee;
+  // 🔥 CORE LOGIC FIXED: Proses transaksi aman dengan pencatatan Relasi Student & Mentor secara akurat
+  Future<void> _processBooking() async {
+    setState(() {
+      _isLoading = true;
+    });
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC), 
-      appBar: AppBar(
-        title: const Text(
-          "Review Checkout",
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Color(0xFF0F172A)),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF0F172A), size: 20),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: Column(
-        children: [
-          // Konten Utama yang bisa di-scroll jika layar HP kecil
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              physics: const BouncingScrollPhysics(),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // KARTU INFORMASI MENTOR
-                  const Text(
-                    "Detail Mentor",
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
-                  ),
-                  const SizedBox(height: 10),
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: const Color(0xFFE2E8F0)),
-                    ),
-                    child: Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 24,
-                          backgroundColor: const Color(0xFFEFF6FF),
-                          child: const Icon(Icons.person_rounded, color: Color(0xFF1A237E)),
-                        ),
-                        const SizedBox(width: 14),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                widget.mentor["name"],
-                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF0F172A)),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                "Universitas ${widget.mentor["campus"]} • ${widget.mentor["major"]}",
-                                style: const TextStyle(color: Color(0xFF64748B), fontSize: 12),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 25),
+    // 1. Ambil user Student yang sedang login saat ini
+    final User? currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) {
+      _showSnackBar("Gagal memproses: Sesi login Anda berakhir.", Colors.red);
+      setState(() => _isLoading = false);
+      return;
+    }
 
-                  // --- METODE PEMBAYARAN CUSTOM ---
-                  const Text(
-                    "Pilih Metode Pembayaran",
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
-                  ),
-                  const SizedBox(height: 10),
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: paymentMethods.length,
-                    itemBuilder: (context, index) {
-                      final method = paymentMethods[index];
-                      final isSelected = selectedPayment == method["id"];
+    final String scheduleId = widget.mentor['schedule_id'] ?? '';
+    if (scheduleId.isEmpty) {
+      _showSnackBar("Gagal memproses: ID Jadwal tidak valid.", Colors.red);
+      setState(() => _isLoading = false);
+      return;
+    }
 
-                      return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            selectedPayment = method["id"];
-                          });
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.only(bottom: 12),
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: isSelected ? const Color(0xFF1A237E) : const Color(0xFFE2E8F0),
-                              width: isSelected ? 2 : 1,
-                            ),
-                            boxShadow: isSelected
-                                ? [BoxShadow(color: const Color(0xFF1A237E).withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))]
-                                : [],
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(method["icon"], color: isSelected ? const Color(0xFF1A237E) : const Color(0xFF94A3B8), size: 24),
-                              const SizedBox(width: 14),
-                              Expanded(
-                                child: Text(
-                                  method["name"],
-                                  style: TextStyle(
-                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                                    fontSize: 14,
-                                    color: isSelected ? const Color(0xFF0F172A) : const Color(0xFF475569),
-                                  ),
-                                ),
-                              ),
-                              // Custom Radio Bulat Estetik
-                              Container(
-                                width: 20,
-                                height: 20,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: isSelected ? const Color(0xFF1A237E) : const Color(0xFFCBD5E1),
-                                    width: isSelected ? 6 : 2,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 20),
+    try {
+      // 2. Ambil data profil Student secara real-time dari collection 'users'
+      DocumentSnapshot studentProfile = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUser.uid)
+          .get();
 
-                  // --- RINCIAN BIAYA ---
-                  const Text(
-                    "Ringkasan Pembayaran",
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
-                  ),
-                  const SizedBox(height: 10),
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: const Color(0xFFE2E8F0)),
-                    ),
-                    child: Column(
-                      children: [
-                        _buildPriceRow("Harga Sesi Mentor", "Rp ${widget.mentor["price"]}", isTotal: false),
-                        const SizedBox(height: 10),
-                        _buildPriceRow("Biaya Layanan Aplikasi", "Rp $serviceFee", isTotal: false),
-                        const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 12),
-                          child: Divider(height: 1, color: Color(0xFFF1F5F9)),
-                        ),
-                        _buildPriceRow("Total Pembayaran", "Rp $total", isTotal: true),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+      if (!studentProfile.exists) {
+        throw Exception("Profil data siswa Anda tidak ditemukan.");
+      }
 
-          // --- STICKY BOTTOM BUTTON ---
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
-                  blurRadius: 20,
-                  offset: const Offset(0, -4),
-                )
-              ],
-            ),
-            child: SafeArea(
-              child: SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1A237E), // Biru gelap premium senada dengan HomeScreen kita
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                  ),
-                  onPressed: () async {
-                    final result = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => TransactionDetailScreen(
-                          paymentMethod: selectedPayment,
-                          total: total,
-                        ),
-                      ),
-                    );
+      Map<String, dynamic> studentData = studentProfile.data() as Map<String, dynamic>;
+      String studentName = studentData['full_name'] ?? 'Siswa Tutoria';
+      String studentClass = (studentData['school_class'] ?? '-').toString();
+      String studentSchool = studentData['school_level'] ?? '-';
 
-                    if (result == true) {
-                      // 2. KETIKA SELESAI PEMBAYARAN SUKSES, PICU PENGIRIMAN DATA KE MAINSCREEN
-                      if (widget.onBooking != null) {
-                        widget.onBooking!({
-                          "name": widget.mentor["name"],
-                          "campus": widget.mentor["campus"],
-                          "image": widget.mentor["image"] ?? "https://randomuser.me/api/portraits/women/1.jpg",
-                          "status": "Ongoing"
-                        });
-                      }
-                      
-                      // Mengembalikan sinyal true ke halaman Home
-                      Navigator.pop(context, true);
-                    }
-                  },
-                  child: const Text(
-                    "Konfirmasi & Bayar",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, letterSpacing: 0.3),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
+      // 3. Ekstrak data Mentor secara aman dengan pengecekan key ganda (full_name / name)
+      String mName = widget.mentor['full_name'] ?? widget.mentor['name'] ?? widget.mentor['mentor_name'] ?? 'Nama Mentor';
+      String mMajor = widget.mentor['major'] ?? widget.mentor['faculty'] ?? '-';
+      String mCampus = widget.mentor['campus'] ?? '-';
+      String mImage = widget.mentor['image'] ?? widget.mentor['mentor_image'] ?? '';
+
+      final DocumentReference scheduleRef =
+          FirebaseFirestore.instance.collection('schedules').doc(scheduleId);
+
+      // 4. Menggunakan Firestore Transaction untuk validasi atomic
+      await FirebaseFirestore.instance.runTransaction((transaction) async {
+        DocumentSnapshot snapshot = await transaction.get(scheduleRef);
+
+        if (!snapshot.exists) {
+          throw Exception("Jadwal ini sudah tidak tersedia.");
+        }
+
+        Map<String, dynamic> scheduleData = snapshot.data() as Map<String, dynamic>;
+        String currentStatus = scheduleData['status'] ?? 'available';
+
+        if (currentStatus != 'available') {
+          throw Exception("Maaf, jadwal ini baru saja di-booking oleh orang lain!");
+        }
+
+        // 🔥 FIX UTAMA 1: Tulis data identitas student DAN pastikan identitas mentor tertulis lengkap di 'schedules'
+        transaction.update(scheduleRef, {
+          'status': 'booked',
+          'student_id': currentUser.uid,
+          'student_name': studentName,
+          'student_class': studentClass,
+          'student_school': studentSchool,
+          'full_name': mName,
+          'major': mMajor,
+          'campus': mCampus,
+          'image': mImage,
+        });
+
+        // 🔥 FIX UTAMA 2: Buat dokumen riwayat transaksi baru di collection 'bookings'
+        DocumentReference bookingRef =
+            FirebaseFirestore.instance.collection('bookings').doc();
+            
+        transaction.set(bookingRef, {
+          'booking_id': bookingRef.id,
+          'schedule_id': scheduleId,
+          'student_id': currentUser.uid, 
+          'student_name': studentName,
+          'mentor_id': widget.mentor['mentor_id'] ?? '',
+          'mentor_name': mName,
+          'mentor_major': mMajor,
+          'mentor_campus': mCampus,
+          'mentor_image': mImage,
+          'day': widget.mentor['day'],
+          'time': widget.mentor['time'],
+          'price': widget.mentor['price'],
+          'created_at': FieldValue.serverTimestamp(),
+          'payment_status': 'success',
+        });
+      });
+
+      _showSnackBar("Booking Berhasil Dikonfirmasi!", Colors.green);
+
+      if (mounted) {
+        Navigator.pop(context, true);
+      }
+    } catch (e) {
+      String errorMessage = e.toString().replaceAll("Exception: ", "");
+      _showSnackBar(errorMessage, Colors.red);
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  void _showSnackBar(String message, Color color) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message, style: const TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: color,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     );
   }
 
-  // Helper widget kecil untuk merapikan teks baris harga kiri-kanan
-  Widget _buildPriceRow(String label, String value, {required bool isTotal}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: isTotal ? 15 : 13,
-            fontWeight: isTotal ? FontWeight.bold : FontWeight.w500,
-            color: isTotal ? const Color(0xFF0F172A) : const Color(0xFF64748B),
+  @override
+  Widget build(BuildContext context) {
+    // Penyelarasan tampilan lokal
+    String displayMentorName = widget.mentor['full_name'] ?? widget.mentor['name'] ?? '-';
+
+    return Scaffold(
+      backgroundColor: const Color(0xFFF8FAFC),
+      appBar: AppBar(
+        title: const Text("Detail Pembayaran", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        backgroundColor: Colors.white,
+        foregroundColor: const Color(0xFF0F172A),
+        elevation: 0,
+        centerTitle: true,
+      ),
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // --- RINGKASAN JADWAL MENTOR ---
+                const Text("Ringkasan Mentor & Jadwal", style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                  ),
+                  child: Row(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: widget.mentor["image"] != null && widget.mentor["image"].toString().startsWith("http")
+                            ? Image.network(widget.mentor["image"], width: 60, height: 60, fit: BoxFit.cover)
+                            : const CircleAvatar(radius: 30, child: Icon(Icons.person)),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(displayMentorName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                            const SizedBox(height: 2),
+                            Text("${widget.mentor['major'] ?? '-'} | ${widget.mentor['campus'] ?? '-'}", style: const TextStyle(color: Color(0xFF64748B), fontSize: 12)),
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                const Icon(Icons.calendar_today_rounded, size: 12, color: Colors.deepPurple),
+                                const SizedBox(width: 4),
+                                Text(widget.mentor["day"] ?? "-", style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                                const SizedBox(width: 10),
+                                const Icon(Icons.access_time_rounded, size: 12, color: Colors.deepPurple),
+                                const SizedBox(width: 4),
+                                Text(widget.mentor["time"] ?? "-", style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                              ],
+                            )
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 25),
+
+                // --- RINCIAN BIAYA ---
+                const Text("Rincian Biaya", style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text("Biaya Sesi Privat", style: TextStyle(color: Color(0xFF64748B))),
+                          Text(_formatCurrency(widget.mentor["price"]), style: const TextStyle(fontWeight: FontWeight.w600)),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text("Biaya Layanan/Aplikasi", style: TextStyle(color: Color(0xFF64748B))),
+                          Text("Rp 0 (FREE)", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
+                        ],
+                      ),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                        child: Divider(color: Color(0xFFF1F5F9)),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text("Total Pembayaran", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                          Text(
+                            _formatCurrency(widget.mentor["price"]),
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Color(0xFF1A237E)),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 30),
+
+                // --- WARNING INFORMASI ---
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFF3E0),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Row(
+                    children: [
+                      Icon(Icons.info_outline_rounded, color: Colors.orange, size: 20),
+                      SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          "Jadwal yang sudah di-booking tidak dapat dibatalkan secara sepihak tanpa persetujuan mentor.",
+                          style: TextStyle(color: Color(0xFFE65100), fontSize: 12, fontWeight: FontWeight.w500),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          // --- LOADING INDICATOR OVERLAY ---
+          if (_isLoading)
+            Container(
+              color: Colors.black.withOpacity(0.3),
+              child: const Center(
+                child: CircularProgressIndicator(color: Color(0xFF1A237E)),
+              ),
+            )
+        ],
+      ),
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          border: Border(top: BorderSide(color: Color(0xFFF1F5F9))),
+        ),
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF1A237E),
+            foregroundColor: Colors.white,
+            minimumSize: const Size(double.infinity, 52),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            elevation: 0,
+          ),
+          onPressed: _isLoading ? null : _processBooking,
+          child: const Text(
+            "Konfirmasi & Bayar Sekarang",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
         ),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: isTotal ? 17 : 14,
-            fontWeight: FontWeight.bold,
-            color: isTotal ? const Color(0xFF1A237E) : const Color(0xFF0F172A),
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

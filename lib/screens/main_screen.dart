@@ -13,41 +13,38 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
-  // Tempat menampung data mentor yang berhasil di-booking
+  // List penyimpan state booking global agar real-time terintegrasi
   final List<Map<String, dynamic>> _globalBookedData = [];
 
   @override
   Widget build(BuildContext context) {
-    // Memasukkan halaman ke dalam list agar datanya sinkron dan real-time
     final List<Widget> pages = [
-      // Index 0: Home Screen
       HomeScreen(
         onBooking: (mentorData) {
           setState(() {
-            // Ketika ada mentor baru yang di-booking, tambahkan ke list global
+            // SINKRONISASI KEY: Menggunakan key 'day' agar dibaca oleh card BookingScreen Anda
             _globalBookedData.add({
-              "name": mentorData["name"] ?? mentorData["full_name"] ?? "Mentor",
+              "name": mentorData["name"] ?? "Mentor",
               "campus": mentorData["campus"] ?? "Universitas",
+              "major": mentorData["major"] ?? "Jurusan",
               "image": mentorData["image"] ?? "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200",
-              "status": "Ongoing",
+              "status": mentorData["status"] ?? "Ongoing",
+              "day": mentorData["day"] ?? "Tanggal Tidak Set", // <-- Menggunakan key 'day' yang konsisten
+              "time": mentorData["time"] ?? "Jam Tidak Set",
             });
-            // Otomatis pindah ke tab Booking (Index 1) untuk melihat hasilnya
+            // Alihkan pandangan tab langsung ke Booking Screen setelah sukses
             _selectedIndex = 1;
           });
         },
       ),
-      
-      // Index 1: Booking Screen bawaanmu (Sekarang datanya otomatis terhubung!)
       BookingScreen(
         bookedData: _globalBookedData,
         onBack: () {
           setState(() {
-            _selectedIndex = 0; // Balik ke Home kalau pencet back di appbar
+            _selectedIndex = 0; 
           });
         },
       ),
-      
-      // Index 2: Profile Screen bawaanmu
       const ProfileScreen(),
     ];
 
@@ -76,7 +73,7 @@ class _MainScreenState extends State<MainScreen> {
             });
           },
           type: BottomNavigationBarType.fixed,
-          backgroundColor: const Color(0xFF1A237E), // Biru gelap tema utama
+          backgroundColor: const Color(0xFF1A237E), 
           selectedItemColor: Colors.white,
           unselectedItemColor: Colors.white.withOpacity(0.4),
           selectedFontSize: 12,
