@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
 import 'booking_screen.dart';
-import 'profile_screen.dart'; 
+import 'profile_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -11,65 +11,82 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int currentIndex = 0;
-  List<Map<String, dynamic>> bookedMentors = [];
+  int _selectedIndex = 0;
 
-  void handleBooking(Map<String, dynamic> mentor) {
-    setState(() {
-      bookedMentors.add({...mentor, "status": "Ongoing"});
-      currentIndex = 1; 
-    });
-  }
+  // List penyimpan state booking global agar real-time terintegrasi
+  final List<Map<String, dynamic>> _globalBookedData = [];
 
   @override
   Widget build(BuildContext context) {
     final List<Widget> pages = [
-      HomeScreen(onBooking: handleBooking), 
-      BookingScreen(bookedData: bookedMentors),
-      const ProfileScreen(), // Halaman Profil 
+      HomeScreen(
+        onBooking: (mentorData) {
+          setState(() {
+            // SINKRONISASI KEY: Menggunakan key 'day' agar dibaca oleh card BookingScreen Anda
+            _globalBookedData.add({
+              "name": mentorData["name"] ?? "Mentor",
+              "campus": mentorData["campus"] ?? "Universitas",
+              "major": mentorData["major"] ?? "Jurusan",
+              "image": mentorData["image"] ?? "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200",
+              "status": mentorData["status"] ?? "Ongoing",
+              "day": mentorData["day"] ?? "Tanggal Tidak Set", // <-- Menggunakan key 'day' yang konsisten
+              "time": mentorData["time"] ?? "Jam Tidak Set",
+            });
+            // Alihkan pandangan tab langsung ke Booking Screen setelah sukses
+            _selectedIndex = 1;
+          });
+        },
+      ),
+      BookingScreen(
+        bookedData: _globalBookedData,
+        onBack: () {
+          setState(() {
+            _selectedIndex = 0; 
+          });
+        },
+      ),
+      const ProfileScreen(),
     ];
 
     return Scaffold(
-      // Menggunakan IndexedStack langsung di body
+      backgroundColor: const Color(0xFFF8FAFC),
       body: IndexedStack(
-        index: currentIndex,
+        index: _selectedIndex,
         children: pages,
       ),
-  
       bottomNavigationBar: Container(
-        height: 70,
-        decoration: const BoxDecoration(
-          color: Color(0xFF1A237E),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            navItem(Icons.home_rounded, 0),
-            navItem(Icons.book_online_rounded, 1),
-            navItem(Icons.person_rounded, 2),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
+            ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget navItem(IconData icon, int index) {
-    bool isActive = currentIndex == index;
-    return GestureDetector(
-      onTap: () => setState(() => currentIndex = index),
-      // Behavior hitTest membantu agar area klik icon lebih luas dan responsif
-      behavior: HitTestBehavior.opaque, 
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 28, color: isActive ? Colors.white : Colors.white24),
-          if (isActive)
-            Container(
-              margin: const EdgeInsets.only(top: 4),
-              height: 4, width: 4,
-              decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-            )
-        ],
+        child: BottomNavigationBar(
+          currentIndex: _selectedIndex,
+          onTap: (index) {
+            setState(() {
+              _selectedIndex = index;
+            });
+          },
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: const Color(0xFF1A237E), 
+          selectedItemColor: Colors.white,
+          unselectedItemColor: Colors.white.withOpacity(0.4),
+          selectedFontSize: 12,
+          unselectedFontSize: 12,
+          selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
+          showUnselectedLabels: true,
+          elevation: 0,
+          items: const [
+            BottomNavigationBarItem(icon: Icon(Icons.home_rounded), label: 'Home'),
+            BottomNavigationBarItem(icon: Icon(Icons.assignment_turned_in_rounded), label: 'Booking'),
+            BottomNavigationBarItem(icon: Icon(Icons.person_rounded), label: 'Profil'),
+          ],
+        ),
       ),
     );
   }

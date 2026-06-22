@@ -10,6 +10,11 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
+  carousel_slider: ^5.1.2
+  http: ^1.6.0
+  firebase_core: ^4.10.0
+  cloud_firestore: ^6.5.0
+  firebase_auth: ^6.5.2
 
 dev_dependencies:
   flutter_test:
@@ -29,3 +34,4 @@ flutter:
     - assets/images/bottomlogin.png
     - assets/images/Tutoria.png
     - assets/images/logotutoria.png
+    - assets/images/siswa.jpg

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'login_screen.dart';
-import 'signup_screen.dart';
+import 'package:tutoria/screens/login_screen.dart';
+import 'package:tutoria/screens/signup_screen.dart';
+import 'package:tutoria/screens/role_selection_screen.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
@@ -64,7 +65,7 @@ class SplashScreen extends StatelessWidget {
 
                   _btnPrimary(context, "Sign In", const LoginScreen()),
                   const SizedBox(height: 12),
-                  _btnOutline(context, "Sign Up", const SignupScreen()),
+                  _btnOutline(context, "Sign Up", RoleSelectionScreen()),
 
                   const SizedBox(height: 30),
                 ],
